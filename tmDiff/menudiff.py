@@ -47,7 +47,7 @@ class Diffable(object):
         >>> o.fmt_attr('foobar')
         'foobar: 42'
         """
-        return "{}: {}".format(attr, getattr(self, attr))
+        return "{0}: {1}".format(attr, getattr(self, attr))
 
     def to_diff(self):
         """Returns diff-able list of attributes for unified diff.
@@ -144,7 +144,7 @@ class Menu(object):
         """Dumps intermediate text file used to perform the unified diff."""
         if not outdir:
             outdir = os.getcwd()
-        filename = "{}.txt".format(os.path.basename(self.filename))
+        filename = "{0}.txt".format(os.path.basename(self.filename))
         with open(os.path.join(outdir, filename), 'wb') as fp:
             for line in self.to_diff():
                 fp.write(line)
