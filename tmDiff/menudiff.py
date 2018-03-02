@@ -23,7 +23,6 @@
 
 import tmTable
 
-import argparse
 import difflib
 import logging
 import sys, os
@@ -151,54 +150,42 @@ class Menu(object):
                 fp.write(line)
                 fp.write(Newline)
 
-def parse_args():
-    parser = argparse.ArgumentParser()
-    parser.add_argument('file', nargs=2, help="XML menu files 'FILE1 FILE2'")
-    parser.add_argument('-d', '--dump', action='store_true', help="dump the extracted intermediate menu content")
-    return parser.parse_args()
+def unified_diff(fromfile, tofile, dump=False, ostream=sys.stdout):
+    """Perform unified diff onn two XML menus.
+    >>> unified_diff("foo.xml", "bar.xml")
+    """
 
-def main():
-    args = parse_args()
+    frommenu = Menu(fromfile)
+    tomenu = Menu(tofile)
 
-    # Read input files
-    fromfile = Menu(args.file[0])
-    tofile = Menu(args.file[1])
+    fromlist = frommenu.to_diff()
+    tolist = tomenu.to_diff()
 
-    # Prepare input string list
-    fromlist = fromfile.to_diff()
-    tolist = tofile.to_diff()
+    if dump:
+        frommenu.dump_intermediate()
+        tomenu.dump_intermediate()
 
-    if args.dump:
-        fromfile.dump_intermediate()
-        tofile.dump_intermediate()
-
-    # Perform an unified diff
-    for line in difflib.unified_diff(fromlist, tolist, fromfile=fromfile.filename, tofile=tofile.filename, lineterm=""):
+    for line in difflib.unified_diff(fromlist, tolist, fromfile=fromfile, tofile=tofile, lineterm=""):
         # Print added lines
         if line.startswith('+'):
-            if sys.stdout.isatty():
-                sys.stdout.write(ColorGreen)
-            sys.stdout.write(Newline)
-            sys.stdout.write(line)
-            if sys.stdout.isatty():
-                sys.stdout.write(ColorClear)
+            if ostream.isatty():
+                ostream.write(ColorGreen)
+            ostream.write(Newline)
+            ostream.write(line)
+            if ostream.isatty():
+                ostream.write(ColorClear)
         # Print removed lines
         elif line.startswith('-'):
-            if sys.stdout.isatty():
-                sys.stdout.write(ColorRed)
-            sys.stdout.write(Newline)
-            sys.stdout.write(line)
-            if sys.stdout.isatty():
-                sys.stdout.write(ColorClear)
+            if ostream.isatty():
+                ostream.write(ColorRed)
+            ostream.write(Newline)
+            ostream.write(line)
+            if ostream.isatty():
+                ostream.write(ColorClear)
         # Print matching lines
         else:
-            sys.stdout.write(Newline)
-            if sys.stdout.isatty():
-                sys.stdout.write(ColorClear)
-            sys.stdout.write(line)
-    sys.stdout.write(Newline)
-
-    sys.exit()
-
-if __name__ == '__main__':
-    main()
+            ostream.write(Newline)
+            if ostream.isatty():
+                ostream.write(ColorClear)
+            ostream.write(line)
+    ostream.write(Newline)
