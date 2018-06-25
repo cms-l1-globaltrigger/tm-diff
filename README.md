@@ -6,10 +6,12 @@ XML Diff
 
 Compare the content of two XML trigger menus using unified diff.
 
-    $ tm-diff [-d|--dump] <file1> <file2>
+    $ tm-diff [-d|--dump] [--skip-impl] <file1> <file2>
 
 Use flag `-d|--dump` to dump the raw text used to diff the menu contents. This
 option will create two text files with the menu names at the current working location.
+
+Use flag `--skip-impl` to ignore implementation details `module_id` and `module_index`.
 
 
 ## Dependencies
@@ -26,4 +28,4 @@ option will create two text files with the menu names at the current working loc
     $ git clone https://gitlab.cern.ch/.../tm-diff.git
     $ cd tm-diff
     $ . setup.sh
-    $ 
+    $

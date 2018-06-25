@@ -4,17 +4,28 @@ import argparse
 import sys, os
 
 from tmDiff import menudiff
+from tmDiff import __version__
 
 def parse_args():
     parser = argparse.ArgumentParser()
     parser.add_argument('file', nargs=2, help="XML menu files 'FILE1 FILE2'")
     parser.add_argument('-d', '--dump', action='store_true', help="dump the extracted intermediate menu content")
+    parser.add_argument('--skip-impl', action='store_true', help="skip implementation details (module_id, module_index)")
+    parser.add_argument('--version', action='version', version="%(prog)s {}".format(__version__))
     return parser.parse_args()
 
 def main():
     args = parse_args()
 
-    menudiff.unified_diff(args.file[0], args.file[1], args.dump)
+    from_file = args.file[0]
+    to_file = args.file[1]
+
+    menudiff.unified_diff(
+        fromfile=from_file,
+        tofile=to_file,
+        dump=args.dump,
+        skipimpl=args.skip_impl
+    )
 
     sys.exit()
 

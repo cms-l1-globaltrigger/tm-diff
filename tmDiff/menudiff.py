@@ -27,12 +27,16 @@ import difflib
 import logging
 import sys, os
 
-Newline = "\n"
-ColorRed = "\033[31m"
-ColorGreen = "\033[32m"
-ColorClear = "\033[0m"
+class TTY:
+    """TTY escape codes."""
+    clear = "\033[0m"
+    red = "\033[31m"
+    green = "\033[32m"
 
 class Diffable(object):
+    """Implements a diffabel object. To be inherited by classes defining class
+    attribute `sorted_attribuites`.
+    """
 
     sorted_attributes = tuple()
 
@@ -49,12 +53,14 @@ class Diffable(object):
         """
         return "{0}: {1}".format(attr, getattr(self, attr))
 
-    def to_diff(self):
+    def to_diff(self, skip=[]):
         """Returns diff-able list of attributes for unified diff.
         >>> o.to_diff()
         ['foo: 42', 'bar: baz']
+        >>> o.to_diff(skip=['bar']) # skip attributes
+        ['foo: 42']
         """
-        return [self.fmt_attr(attr) for attr in self.sorted_attributes]
+        return [self.fmt_attr(attr) for attr in self.sorted_attributes if attr not in skip]
 
 class Meta(Diffable):
     """Simple menu metadata container.
@@ -86,6 +92,11 @@ class Algorithm(Diffable):
         'comment',
     )
 
+    impl_attributes = (
+        'module_id',
+        'module_index',
+    )
+
 class Cut(Diffable):
 
     sorted_attributes = (
@@ -101,7 +112,8 @@ class Cut(Diffable):
 class Menu(object):
     """Simple menu container."""
 
-    def __init__(self, filename):
+    def __init__(self, filename, skipimpl=False):
+        self.skipimpl = skipimpl
         self.load(filename)
 
     def load(self, filename):
@@ -133,7 +145,9 @@ class Menu(object):
         # Algorithms
         for algorithm in sorted(self.algorithms, key=lambda algorithm: algorithm.name):
             items.append("") # separate by an empty line
-            items.extend(algorithm.to_diff())
+            # Skip implemetation attributes on demand.
+            skip = Algorithm.impl_attributes if self.skipimpl else []
+            items.extend(algorithm.to_diff(skip=skip))
         # Cuts
         for cut in sorted(self.cuts, key=lambda cut: cut.name):
             items.append("") # separate by an empty line
@@ -148,15 +162,15 @@ class Menu(object):
         with open(os.path.join(outdir, filename), 'wb') as fp:
             for line in self.to_diff():
                 fp.write(line)
-                fp.write(Newline)
+                fp.write(os.linesep)
 
-def unified_diff(fromfile, tofile, dump=False, ostream=sys.stdout):
+def unified_diff(fromfile, tofile, dump=False, skipimpl=False, ostream=sys.stdout):
     """Perform unified diff onn two XML menus.
     >>> unified_diff("foo.xml", "bar.xml")
     """
 
-    frommenu = Menu(fromfile)
-    tomenu = Menu(tofile)
+    frommenu = Menu(fromfile, skipimpl)
+    tomenu = Menu(tofile, skipimpl)
 
     fromlist = frommenu.to_diff()
     tolist = tomenu.to_diff()
@@ -169,23 +183,23 @@ def unified_diff(fromfile, tofile, dump=False, ostream=sys.stdout):
         # Print added lines
         if line.startswith('+'):
             if ostream.isatty():
-                ostream.write(ColorGreen)
-            ostream.write(Newline)
+                ostream.write(TTY.green)
+            ostream.write(os.linesep)
             ostream.write(line)
             if ostream.isatty():
-                ostream.write(ColorClear)
+                ostream.write(TTY.clear)
         # Print removed lines
         elif line.startswith('-'):
             if ostream.isatty():
-                ostream.write(ColorRed)
-            ostream.write(Newline)
+                ostream.write(TTY.red)
+            ostream.write(os.linesep)
             ostream.write(line)
             if ostream.isatty():
-                ostream.write(ColorClear)
+                ostream.write(TTY.clear)
         # Print matching lines
         else:
-            ostream.write(Newline)
+            ostream.write(os.linesep)
             if ostream.isatty():
-                ostream.write(ColorClear)
+                ostream.write(TTY.clear)
             ostream.write(line)
-    ostream.write(Newline)
+    ostream.write(os.linesep)
