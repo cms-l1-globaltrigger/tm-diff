@@ -1,17 +1,27 @@
-XML Diff
-========
+XML Menu Diff
+=============
 
 
 ## Basic usage
 
-Compare the content of two XML trigger menus using unified diff.
+Compare the content of two XML trigger menus.
 
-    $ tm-diff [-d|--dump] [--skip-impl] <file1> <file2>
+    $ tm-diff [-f|--format <fmt>] [-s|--skip <mode>] [-d|--dump] <file1> <file2>
+
+Use flag `-f|--format` to select diff output format. Options are `unified`,
+ `context` and `report` (to be copy-pasted into TWiki reports). Default is `unified`.
+
+    $ tm-diff ... -freport  # prints output in TWiki report format
+
+Use flag `--skip <module|comment>` to ignore module specific implementation
+details (attributes `module_id` and `module_index`) or comments (attribute `comment`).
+
+    $ tm-diff ... -smodule -scomment  # ignores module_is/index and any comments
 
 Use flag `-d|--dump` to dump the raw text used to diff the menu contents. This
 option will create two text files with the menu names at the current working location.
 
-Use flag `--skip-impl` to ignore implementation details `module_id` and `module_index`.
+    $ tm-diff foo.xml bar.xml -d  # dumps raw text to foo.xml.txt bar.xml.txt
 
 
 ## Dependencies

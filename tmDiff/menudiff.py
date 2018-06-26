@@ -32,6 +32,9 @@ class TTY:
     clear = "\033[0m"
     red = "\033[31m"
     green = "\033[32m"
+    yellow = "\033[33m"
+    blue = "\033[34m"
+    magenta = "\033[35m"
 
 class Diffable(object):
     """Implements a diffabel object. To be inherited by classes defining class
@@ -92,9 +95,10 @@ class Algorithm(Diffable):
         'comment',
     )
 
-    impl_attributes = (
-        'module_id',
-        'module_index',
+    report_attributes = (
+        'index',
+        'name',
+        'expression',
     )
 
 class Cut(Diffable):
@@ -112,9 +116,9 @@ class Cut(Diffable):
 class Menu(object):
     """Simple menu container."""
 
-    def __init__(self, filename, skipimpl=False):
-        self.skipimpl = skipimpl
+    def __init__(self, filename, skip=None):
         self.load(filename)
+        self.skip = skip or [] # list of attributes to skip for diff
 
     def load(self, filename):
         """Load menu from XML file."""
@@ -141,17 +145,15 @@ class Menu(object):
         """Returns list of attributes to be read by unified_diff."""
         items = []
         # Metadata
-        items.extend(self.meta.to_diff())
+        items.extend(self.meta.to_diff(skip=self.skip))
         # Algorithms
         for algorithm in sorted(self.algorithms, key=lambda algorithm: algorithm.name):
             items.append("") # separate by an empty line
-            # Skip implemetation attributes on demand.
-            skip = Algorithm.impl_attributes if self.skipimpl else []
-            items.extend(algorithm.to_diff(skip=skip))
+            items.extend(algorithm.to_diff(skip=self.skip))
         # Cuts
         for cut in sorted(self.cuts, key=lambda cut: cut.name):
             items.append("") # separate by an empty line
-            items.extend(cut.to_diff())
+            items.extend(cut.to_diff(skip=self.skip))
         return items
 
     def dump_intermediate(self, outdir=None):
@@ -164,22 +166,83 @@ class Menu(object):
                 fp.write(line)
                 fp.write(os.linesep)
 
-def unified_diff(fromfile, tofile, dump=False, skipimpl=False, ostream=sys.stdout):
-    """Perform unified diff onn two XML menus.
-    >>> unified_diff("foo.xml", "bar.xml")
+
+def report_diff(fromfile, tofile, verbose=False, ostream=sys.stdout):
+    """Perform simple diff on two menus in TWiki format for reports.
+    >>> report_diff(fromfile, tofile)
+    """
+    fromlist = fromfile.to_diff()
+    tolist = tofile.to_diff()
+
+    from_algorithms = {}
+    to_algorithms = {}
+
+    for algorithm in fromfile.algorithms:
+        from_algorithms[algorithm.name] = algorithm
+    for algorithm in tofile.algorithms:
+        to_algorithms[algorithm.name] = algorithm
+
+    def added_algorithms(a, b):
+        algorithms = []
+        names = [algorithm.name for algorithm in b.algorithms]
+        for algorithm in a.algorithms:
+            if algorithm.name not in names:
+                algorithms.append(algorithm)
+        return algorithms
+
+    added = added_algorithms(tofile, fromfile)
+    removed = added_algorithms(fromfile, tofile)
+    updated = []
+
+    for name, fromalgorithm in from_algorithms.iteritems():
+        if name in to_algorithms:
+            toalgorithm = to_algorithms[name]
+            differences = []
+            for attr in toalgorithm.report_attributes:
+                if getattr(fromalgorithm, attr) != getattr(toalgorithm, attr):
+                    differences.append([attr, getattr(fromalgorithm, attr), getattr(toalgorithm, attr)])
+            if differences:
+                updated.append([toalgorithm, differences])
+
+    if added or removed or updated:
+        ostream.write("---++ Changes with respect to !{}".format(fromfile.meta.name))
+        ostream.write(os.linesep)
+
+    if added:
+        ostream.write("   * Added the following algorithms")
+        ostream.write(os.linesep)
+        for algorithm in added:
+            ostream.write("      * {}".format(algorithm.name))
+            ostream.write(os.linesep)
+
+    if updated:
+        ostream.write("   * Changed the following algorithms")
+        ostream.write(os.linesep)
+        for algorithm, differnces in updated:
+            ostream.write("      * {}".format(algorithm.name))
+            ostream.write(os.linesep)
+            # Verbose changes
+            if verbose:
+                for attr, left, right in differnces:
+                    ostream.write("          * {}: {} --> {}".format(attr, left, right))
+                    ostream.write(os.linesep)
+
+    if removed:
+        ostream.write("   * Removed the following algorithms")
+        ostream.write(os.linesep)
+        for algorithm in removed:
+            ostream.write("      * {}".format(algorithm.name))
+            ostream.write(os.linesep)
+
+def unified_diff(fromfile, tofile, ostream=sys.stdout):
+    """Perform unified diff on two menus.
+    >>> unified_diff(fromfile, tofile)
     """
 
-    frommenu = Menu(fromfile, skipimpl)
-    tomenu = Menu(tofile, skipimpl)
+    fromlines = fromfile.to_diff()
+    tolines = tofile.to_diff()
 
-    fromlist = frommenu.to_diff()
-    tolist = tomenu.to_diff()
-
-    if dump:
-        frommenu.dump_intermediate()
-        tomenu.dump_intermediate()
-
-    for line in difflib.unified_diff(fromlist, tolist, fromfile=fromfile, tofile=tofile, lineterm=""):
+    for line in difflib.unified_diff(fromlines, tolines, fromfile=fromfile.filename, tofile=tofile.filename, lineterm=""):
         # Print added lines
         if line.startswith('+'):
             if ostream.isatty():
@@ -192,6 +255,63 @@ def unified_diff(fromfile, tofile, dump=False, skipimpl=False, ostream=sys.stdou
         elif line.startswith('-'):
             if ostream.isatty():
                 ostream.write(TTY.red)
+            ostream.write(os.linesep)
+            ostream.write(line)
+            if ostream.isatty():
+                ostream.write(TTY.clear)
+        # Print diff markers
+        elif line.startswith('@@'):
+            if ostream.isatty():
+                ostream.write(TTY.yellow)
+            ostream.write(os.linesep)
+            ostream.write(line)
+            if ostream.isatty():
+                ostream.write(TTY.clear)
+        # Print matching lines
+        else:
+            ostream.write(os.linesep)
+            if ostream.isatty():
+                ostream.write(TTY.clear)
+            ostream.write(line)
+    ostream.write(os.linesep)
+
+def context_diff(fromfile, tofile, ostream=sys.stdout):
+    """Perform context diff on two menus.
+    >>> context_diff(fromfile, tofile)
+    """
+
+    fromlines = fromfile.to_diff()
+    tolines = tofile.to_diff()
+
+    for line in difflib.context_diff(fromlines, tolines, fromfile=fromfile.filename, tofile=tofile.filename, lineterm=""):
+        # Print added lines
+        if line.startswith('+ '):
+            if ostream.isatty():
+                ostream.write(TTY.green)
+            ostream.write(os.linesep)
+            ostream.write(line)
+            if ostream.isatty():
+                ostream.write(TTY.clear)
+        # Print removed lines
+        elif line.startswith('- '):
+            if ostream.isatty():
+                ostream.write(TTY.red)
+            ostream.write(os.linesep)
+            ostream.write(line)
+            if ostream.isatty():
+                ostream.write(TTY.clear)
+        # Print changed lines
+        elif line.startswith('! '):
+            if ostream.isatty():
+                ostream.write(TTY.magenta)
+            ostream.write(os.linesep)
+            ostream.write(line)
+            if ostream.isatty():
+                ostream.write(TTY.clear)
+        # Print diff markers
+        elif line.startswith('---') or line.startswith('***'):
+            if ostream.isatty():
+                ostream.write(TTY.yellow)
             ostream.write(os.linesep)
             ostream.write(line)
             if ostream.isatty():
