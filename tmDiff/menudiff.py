@@ -205,33 +205,33 @@ def report_diff(fromfile, tofile, verbose=False, ostream=sys.stdout):
                 updated.append([toalgorithm, differences])
 
     if added or removed or updated:
-        ostream.write("---++ Changes with respect to !{}".format(fromfile.meta.name))
+        ostream.write("---++ Changes with respect to !{0}".format(fromfile.meta.name))
         ostream.write(os.linesep)
 
     if added:
         ostream.write("   * Added the following algorithms")
         ostream.write(os.linesep)
         for algorithm in added:
-            ostream.write("      * {}".format(algorithm.name))
+            ostream.write("      * {0}".format(algorithm.name))
             ostream.write(os.linesep)
 
     if updated:
         ostream.write("   * Changed the following algorithms")
         ostream.write(os.linesep)
         for algorithm, differnces in updated:
-            ostream.write("      * {}".format(algorithm.name))
+            ostream.write("      * {0}".format(algorithm.name))
             ostream.write(os.linesep)
             # Verbose changes
             if verbose:
                 for attr, left, right in differnces:
-                    ostream.write("          * {}: {} --> {}".format(attr, left, right))
+                    ostream.write("          * {0}: {1} --> {2}".format(attr, left, right))
                     ostream.write(os.linesep)
 
     if removed:
         ostream.write("   * Removed the following algorithms")
         ostream.write(os.linesep)
         for algorithm in removed:
-            ostream.write("      * {}".format(algorithm.name))
+            ostream.write("      * {0}".format(algorithm.name))
             ostream.write(os.linesep)
 
 def unified_diff(fromfile, tofile, ostream=sys.stdout):
