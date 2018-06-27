@@ -342,6 +342,7 @@ def html_diff(fromfile, tofile, ostream=sys.stdout):
 
     timestamp = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 
+    # patching CSS style and adding a footer
     patches = [
         [
             """</style>""",
@@ -384,6 +385,6 @@ def html_diff(fromfile, tofile, ostream=sys.stdout):
     ]
 
     for needle, patch in patches:
-        html = html.replace(needle, patch, 1)
+        html = html.replace(needle, patch, 1) # patch only first occurence
 
     ostream.write(html)
