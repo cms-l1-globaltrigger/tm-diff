@@ -17,29 +17,29 @@ Use flag `-f|--format <format>` to select diff output format. Options are:
 
 Default format is `unified`.
 
-**Example**
+**Example:**
 
     $ tm-diff ... -fhtml -o diff.html  # dumps diff as HTML table to file
 
 Use flag `--skip <mode>` to ignore certain attributes. Options are
 
- * `module` to skip implementation details (attributes `firmware_uuid`, `n_modules`, `module_id` and `module_index`)
+ * `module` to skip implementation details (attributes `uuid_firmware`, `n_modules`, `module_id`, `module_index`)
  * `comment` to skip comments (attribute `comment`)
 
-**Example**
+**Example:**
 
     $ tm-diff ... -smodule -scomment  # ignores module_is/index and any comments
 
 Use flag `-d|--dump` to dump the raw text used to diff the menu contents. This
 option will create two text files with the menu names at the current working location.
 
-**Example**
+**Example:**
 
     $ tm-diff foo.xml bar.xml -d  # dumps raw text to foo.xml.txt bar.xml.txt
 
 Use flag `-o <file>` to write the output to a file.
 
-**Example**
+**Example:**
 
     $ tm-diff foo.xml bar.xml -o diff.txt  # write output to file
 

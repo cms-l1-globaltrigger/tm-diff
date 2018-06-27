@@ -37,6 +37,7 @@ def main():
     skip = []
 
     if SKIP_MODULE in args.skip:
+        skip.append('uuid_firmware')
         skip.append('n_modules')
         skip.append('module_id')
         skip.append('module_index')
