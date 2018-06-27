@@ -45,8 +45,8 @@ def main():
     to_menu = menudiff.Menu(to_file, skip)
 
     if args.dump:
-        frommenu.dump_intermediate()
-        tomenu.dump_intermediate()
+        from_menu.dump_intermediate()
+        to_menu.dump_intermediate()
 
     if args.format == FMT_UNIFIED:
         menudiff.unified_diff(
