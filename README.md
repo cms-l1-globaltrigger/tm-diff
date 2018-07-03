@@ -6,7 +6,9 @@ XML Menu Diff
 
 Compare the content of two XML trigger menus.
 
-    $ tm-diff [-f|--format <format>] [-s|--skip <mode>] [-d|--dump] [-o <file>] <file1> <file2>
+    $ tm-diff [-f|--format <format>] [-s|--skip <mode>] [--sort <key>]
+              [-d|--dump] [-o <file>]
+              <file1> <file2>
 
 ### Format
 
