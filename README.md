@@ -8,6 +8,8 @@ Compare the content of two XML trigger menus.
 
     $ tm-diff [-f|--format <format>] [-s|--skip <mode>] [-d|--dump] [-o <file>] <file1> <file2>
 
+### Format
+
 Use flag `-f|--format <format>` to select diff output format. Options are:
 
  * `unified` for unified diff format
@@ -21,7 +23,9 @@ Default format is `unified`.
 
     $ tm-diff ... -fhtml -o diff.html  # dumps diff as HTML table to file
 
-Use flag `--skip <mode>` to ignore certain attributes. Options are
+### Skip
+
+Use flag `-s|--skip <mode>` to ignore certain attributes. Options are
 
  * `module` to skip implementation details (attributes `uuid_firmware`, `n_modules`, `module_id`, `module_index`)
  * `comment` to skip comments (attribute `comment`)
@@ -30,12 +34,26 @@ Use flag `--skip <mode>` to ignore certain attributes. Options are
 
     $ tm-diff ... -smodule -scomment  # ignores module_is/index and any comments
 
+### Sort
+
+Use flag `--sort <key>` to sort algorithms by attribute. Options are
+
+ * `index` to sort by algorithm index
+ * `name` to sort by algorithm name
+ * `expression` to sort by algorithm expression
+
+Default sort kay is `index`.
+
+### Dump
+
 Use flag `-d|--dump` to dump the raw text used to diff the menu contents. This
 option will create two text files with the menu names at the current working location.
 
 **Example:**
 
     $ tm-diff foo.xml bar.xml -d  # dumps raw text to foo.xml.txt bar.xml.txt
+
+### Output
 
 Use flag `-o <file>` to write the output to a file.
 

@@ -119,9 +119,10 @@ class Cut(Diffable):
 class Menu(object):
     """Simple menu container."""
 
-    def __init__(self, filename, skip=None):
+    def __init__(self, filename):
         self.load(filename)
-        self.skip = skip or [] # list of attributes to skip for diff
+        self.skip = [] # list of attributes to skip
+        self.sort = 'index' # sort key for algorithms
 
     def load(self, filename):
         """Load menu from XML file."""
@@ -134,7 +135,7 @@ class Menu(object):
             raise RuntimeError(message)
         # Collect list of metadata
         self.meta = Meta(**menu.menu)
-        # Collect list of algorithms
+        # Collect list of algorithms and cuts
         self.algorithms = []
         cuts = {}
         for row in menu.algorithms:
@@ -144,17 +145,29 @@ class Menu(object):
                     cuts[cut['name']] = Cut(**cut)
         self.cuts = cuts.values()
 
+    def sorted_algorithms(self):
+        """Returns sorted list of algorithms."""
+        def sort_key(algorithm):
+            if self.sort == 'index':
+                return int(algorithm.index)
+            return getattr(algorithm, self.sort)
+        return sorted(self.algorithms, key=sort_key)
+
+    def sorted_cuts(self):
+        """Returns sorted list of cuts."""
+        return sorted(self.cuts, key=lambda cut: cut.name)
+
     def to_diff(self):
         """Returns list of attributes to be read by unified_diff."""
         items = []
         # Metadata
         items.extend(self.meta.to_diff(skip=self.skip))
         # Algorithms
-        for algorithm in sorted(self.algorithms, key=lambda algorithm: algorithm.name):
+        for algorithm in self.sorted_algorithms():
             items.append("") # separate by an empty line
             items.extend(algorithm.to_diff(skip=self.skip))
         # Cuts
-        for cut in sorted(self.cuts, key=lambda cut: cut.name):
+        for cut in self.sorted_cuts():
             items.append("") # separate by an empty line
             items.extend(cut.to_diff(skip=self.skip))
         return items
@@ -168,7 +181,6 @@ class Menu(object):
             for line in self.to_diff():
                 fp.write(line)
                 fp.write(os.linesep)
-
 
 def report_diff(fromfile, tofile, verbose=False, ostream=sys.stdout):
     """Perform simple diff on two menus in TWiki format for reports.
@@ -237,7 +249,7 @@ def report_diff(fromfile, tofile, verbose=False, ostream=sys.stdout):
             ostream.write("      * {0}".format(algorithm.name))
             ostream.write(os.linesep)
 
-def unified_diff(fromfile, tofile, ostream=sys.stdout):
+def unified_diff(fromfile, tofile, verbose=False, ostream=sys.stdout):
     """Perform unified diff on two menus.
     >>> unified_diff(fromfile, tofile)
     """
@@ -277,7 +289,7 @@ def unified_diff(fromfile, tofile, ostream=sys.stdout):
             ostream.write(line)
     ostream.write(os.linesep)
 
-def context_diff(fromfile, tofile, ostream=sys.stdout):
+def context_diff(fromfile, tofile, verbose=False, ostream=sys.stdout):
     """Perform context diff on two menus.
     >>> context_diff(fromfile, tofile)
     """
@@ -325,7 +337,7 @@ def context_diff(fromfile, tofile, ostream=sys.stdout):
             ostream.write(line)
     ostream.write(os.linesep)
 
-def html_diff(fromfile, tofile, ostream=sys.stdout):
+def html_diff(fromfile, tofile, verbose=False, ostream=sys.stdout):
     """Perform diff on two menus and writes results to HTML table.
     >>> with open("sample.html", "w") as f:
     ...     html_diff(fromfile, tofile, f)
