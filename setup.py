@@ -1,10 +1,11 @@
 from distutils.core import setup
+from tmDiff import __version__ as version
 
 long_description = open('README.md').read()
 
 setup(
     name="tm-diff",
-    version='0.5.0',
+    version=version,
     url="https://github.com/cms-l1-globaltrigger/tm-diff",
     author="Bernhard Arnold",
     author_email="bernhard.arnold@cern.ch",
