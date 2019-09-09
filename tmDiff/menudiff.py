@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-#
 # Diff for XML menus
 #
 # The algorithm specific content is extracted into a simple text representation

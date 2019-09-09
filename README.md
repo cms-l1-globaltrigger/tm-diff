@@ -6,9 +6,11 @@ XML Menu Diff
 
 Compare the content of two XML trigger menus.
 
-    $ tm-diff [-f|--format <format>] [-s|--skip <mode>] [--sort <key>]
-              [-d|--dump] [-o <file>]
-              <file1> <file2>
+```bash
+tm-diff [-f|--format <format>] [-s|--skip <mode>] [--sort <key>]
+        [-d|--dump] [-o <file>]
+        <file1> <file2>
+```
 
 ### Format
 
@@ -23,7 +25,9 @@ Default format is `unified`.
 
 **Example:**
 
-    $ tm-diff ... -fhtml -o diff.html  # dumps diff as HTML table to file
+```bash
+tm-diff ... -fhtml -o diff.html  # dumps diff as HTML table to file
+```
 
 ### Skip
 
@@ -34,7 +38,9 @@ Use flag `-s|--skip <mode>` to ignore certain attributes. Options are
 
 **Example:**
 
-    $ tm-diff ... -smodule -scomment  # ignores module_is/index and any comments
+```bash
+tm-diff ... -smodule -scomment  # ignores module_is/index and any comments
+```
 
 ### Sort
 
@@ -53,7 +59,9 @@ option will create two text files with the menu names at the current working loc
 
 **Example:**
 
-    $ tm-diff foo.xml bar.xml -d  # dumps raw text to foo.xml.txt bar.xml.txt
+```bash
+tm-diff foo.xml bar.xml -d  # dumps raw text to foo.xml.txt bar.xml.txt
+```
 
 ### Output
 
@@ -61,25 +69,36 @@ Use flag `-o <file>` to write the output to a file.
 
 **Example:**
 
-    $ tm-diff foo.xml bar.xml -o diff.txt  # write output to file
+```bash
+tm-diff foo.xml bar.xml -o diff.txt  # write output to file
+```
 
 This is equivalent to:
 
-    $ tm-diff foo.xml bar.xml > diff.txt  # pipe stdout to file
-
+```bash
+tm-diff foo.xml bar.xml > diff.txt  # pipe stdout to file
+```
 
 ## Dependencies
 
- * `tmTable`
+Install following l1t-utm wheel or build l1t-utm python bindings.
 
-**Note:** make sure to set `UTM_ROOT` before executing.
+ * `tmTable>=0.7.3`
 
 
-## Setup
+## Install
 
-    $ . /path/to/utm-0.6.x/setup.sh  # source UTM environment
+Install using pip
 
-    $ git clone https://gitlab.cern.ch/.../tm-diff.git
-    $ cd tm-diff
-    $ . setup.sh
-    $
+```bash
+pip install https://github.com/cms-l1-globaltrigger/tm-diff/archive/master.zip#egg=tm-diff-0.6.0
+```
+
+Install from local source
+
+```bash
+git clone https://gitlab.cern.ch/cms-l1-globaltrigger/tm-diff.git
+cd tm-diff
+python setup.py test
+python setup.py install
+```
