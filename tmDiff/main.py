@@ -3,8 +3,8 @@
 import argparse
 import sys, os
 
-from tmDiff import menudiff
-from tmDiff import __version__
+from . import menudiff
+from . import __version__
 
 FMT_UNIFIED = 'unified'
 FMT_CONTEXT = 'context'
@@ -112,11 +112,11 @@ def main():
     DIFF_FUNCTIONS[args.format](
         fromfile=from_menu,
         tofile=to_menu,
-        verbose=args.verbose > 0,
+        verbose=args.verbose,
         ostream=args.ostream
     )
 
-    sys.exit()
+    return 0
 
 if __name__ == '__main__':
-    main()
+    sys.exit(main())
