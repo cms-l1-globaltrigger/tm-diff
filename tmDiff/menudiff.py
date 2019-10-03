@@ -1,23 +1,23 @@
-# Diff for XML menus
-#
-# The algorithm specific content is extracted into a simple text representation
-# and a unified diff is applied to make differences visible.
-#
-# Diff format, blocks are separated by empty lines:
-#
-# ----
-# index: <index>
-# module_id: <module_id>
-# module_index: <module_index>
-# name: <name>
-# expression: <expression>
-# comment: <comment>
-# ----
-#
-# The printed line information refers to the extracted content (can be dumped
-# with flag -d
-#
+"""Diff for XML menus
 
+The algorithm specific content is extracted into a simple text representation
+and a unified diff is applied to make differences visible.
+
+Diff format, blocks are separated by empty lines:
+
+```
+index: <index>
+module_id: <module_id>
+module_index: <module_index>
+name: <name>
+expression: <expression>
+comment: <comment>
+```
+
+The printed line information refers to the extracted content (can be dumped
+with flag -d
+
+"""
 
 import tmTable
 

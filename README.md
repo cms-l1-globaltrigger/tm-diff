@@ -1,7 +1,6 @@
 XML Menu Diff
 =============
 
-
 ## Basic usage
 
 Compare the content of two XML trigger menus.
@@ -81,17 +80,16 @@ tm-diff foo.xml bar.xml > diff.txt  # pipe stdout to file
 
 ## Dependencies
 
-Install following l1t-utm wheel or build l1t-utm python bindings.
+Install following utm wheels or build utm python bindings.
 
- * `tmTable>=0.7.3`
-
+ * [`tm-table>=0.7.3`](https://github.com/cms-l1-globaltrigger/tm-table)
 
 ## Install
 
 Install using pip
 
 ```bash
-pip install https://github.com/cms-l1-globaltrigger/tm-diff/archive/master.zip#egg=tm-diff-0.6.0
+pip install git+https://github.com/cms-l1-globaltrigger/tm-diff.git@0.6.1
 ```
 
 Install from local source
@@ -99,6 +97,5 @@ Install from local source
 ```bash
 git clone https://gitlab.cern.ch/cms-l1-globaltrigger/tm-diff.git
 cd tm-diff
-python setup.py test
 python setup.py install
 ```
