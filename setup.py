@@ -4,7 +4,7 @@ long_description = open('README.md').read()
 
 setup(
     name="tm-diff",
-    version='0.6.2',
+    version='0.6.3',
     url="https://github.com/cms-l1-globaltrigger/tm-diff",
     author="Bernhard Arnold",
     author_email="bernhard.arnold@cern.ch",
@@ -12,7 +12,7 @@ setup(
     long_description=long_description,
     packages=['tmDiff'],
     install_requires=[
-        'tm-python @ git+https://github.com/cms-l1-globaltrigger/tm-python@0.7.3',
+        'tm-python @ git+https://github.com/cms-l1-globaltrigger/tm-python@0.7.4',
     ],
     entry_points={
         'console_scripts': [
