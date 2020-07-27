@@ -43,6 +43,7 @@ Use flag `-s|--skip <mode>` to ignore certain attributes. Options are
 
  * `module` to skip implementation details (attributes `uuid_firmware`, `n_modules`, `module_id`, `module_index`)
  * `comment` to skip comments (attribute `comment`)
+ * `labels` to skip algorithm labels (attribute `labels`)
 
 **Example:**
 
