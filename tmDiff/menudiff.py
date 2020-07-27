@@ -94,12 +94,14 @@ class Algorithm(Diffable):
         'name',
         'expression',
         'comment',
+        'labels',
     )
 
     report_attributes = (
         'index',
         'name',
         'expression',
+        'labels',
     )
 
 class Cut(Diffable):
