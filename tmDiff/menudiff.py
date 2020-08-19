@@ -12,6 +12,7 @@ module_index: <module_index>
 name: <name>
 expression: <expression>
 comment: <comment>
+labels: <labels>
 ```
 
 The printed line information refers to the extracted content (can be dumped
@@ -19,12 +20,12 @@ with flag -d
 
 """
 
-import tmTable
-
 import datetime
 import difflib
-import logging
-import sys, os
+import os
+import sys
+
+import tmTable
 
 from . import __version__
 
@@ -37,7 +38,7 @@ class TTY:
     blue = "\033[34m"
     magenta = "\033[35m"
 
-class Diffable(object):
+class Diffable:
     """Implements a diffabel object. To be inherited by classes defining class
     attribute `sorted_attribuites`.
     """
@@ -57,19 +58,18 @@ class Diffable(object):
         """
         return "{0}: {1}".format(attr, getattr(self, attr))
 
-    def to_diff(self, skip=[]):
+    def to_diff(self, skip=None):
         """Returns diff-able list of attributes for unified diff.
         >>> o.to_diff()
         ['foo: 42', 'bar: baz']
         >>> o.to_diff(skip=['bar']) # skip attributes
         ['foo: 42']
         """
+        skip = skip or []
         return [self.fmt_attr(attr) for attr in self.sorted_attributes if attr not in skip]
 
 class Meta(Diffable):
-    """Simple menu metadata container.
-    >>> meta = Meta(**row)
-    """
+    """Diffable menu metadata container."""
 
     sorted_attributes = (
         'name',
@@ -83,9 +83,7 @@ class Meta(Diffable):
     )
 
 class Algorithm(Diffable):
-    """Simple algorithm container.
-    >>> algorithm = Algorithm(**row)
-    """
+    """Diffable algorithm container."""
 
     sorted_attributes = (
         'index',
@@ -94,15 +92,18 @@ class Algorithm(Diffable):
         'name',
         'expression',
         'comment',
+        'labels',
     )
 
     report_attributes = (
         'index',
         'name',
         'expression',
+        'labels',
     )
 
 class Cut(Diffable):
+    """Diffable cut container."""
 
     sorted_attributes = (
         'name',
@@ -114,7 +115,7 @@ class Cut(Diffable):
         'comment',
     )
 
-class Menu(object):
+class Menu:
     """Simple menu container."""
 
     def __init__(self, filename):
@@ -175,7 +176,7 @@ class Menu(object):
         if not outdir:
             outdir = os.getcwd()
         filename = "{0}.txt".format(os.path.basename(self.filename))
-        with open(os.path.join(outdir, filename), 'wb') as fp:
+        with open(os.path.join(outdir, filename), 'w') as fp:
             for line in self.to_diff():
                 fp.write(line)
                 fp.write(os.linesep)
@@ -184,9 +185,6 @@ def report_diff(fromfile, tofile, verbose=False, ostream=sys.stdout):
     """Perform simple diff on two menus in TWiki format for reports.
     >>> report_diff(fromfile, tofile)
     """
-    fromlist = fromfile.to_diff()
-    tolist = tofile.to_diff()
-
     from_algorithms = {}
     to_algorithms = {}
 
@@ -207,7 +205,7 @@ def report_diff(fromfile, tofile, verbose=False, ostream=sys.stdout):
     removed = added_algorithms(fromfile, tofile)
     updated = []
 
-    for name, fromalgorithm in from_algorithms.iteritems():
+    for name, fromalgorithm in from_algorithms.items():
         if name in to_algorithms:
             toalgorithm = to_algorithms[name]
             differences = []
@@ -254,38 +252,51 @@ def unified_diff(fromfile, tofile, verbose=False, ostream=sys.stdout):
     fromlines = fromfile.to_diff()
     tolines = tofile.to_diff()
 
+    def write_added(line):
+        if ostream.isatty():
+            ostream.write(TTY.green)
+        ostream.write(line)
+        if ostream.isatty():
+            ostream.write(TTY.clear)
+
+    def write_removed(line):
+        if ostream.isatty():
+            ostream.write(TTY.red)
+        ostream.write(line)
+        if ostream.isatty():
+            ostream.write(TTY.clear)
+
+    def write_marker(line):
+        if ostream.isatty():
+            ostream.write(TTY.yellow)
+        ostream.write(line)
+        if ostream.isatty():
+            ostream.write(TTY.clear)
+
+    def write_match(line):
+        ostream.write(line)
+
+    count = 0
     for line in difflib.unified_diff(fromlines, tolines, fromfile=fromfile.filename, tofile=tofile.filename, lineterm=""):
+        if count:
+            ostream.write(os.linesep)
         # Print added lines
         if line.startswith('+'):
-            if ostream.isatty():
-                ostream.write(TTY.green)
-            ostream.write(os.linesep)
-            ostream.write(line)
-            if ostream.isatty():
-                ostream.write(TTY.clear)
+            write_added(line)
         # Print removed lines
         elif line.startswith('-'):
-            if ostream.isatty():
-                ostream.write(TTY.red)
-            ostream.write(os.linesep)
-            ostream.write(line)
-            if ostream.isatty():
-                ostream.write(TTY.clear)
+            write_removed(line)
         # Print diff markers
         elif line.startswith('@@'):
-            if ostream.isatty():
-                ostream.write(TTY.yellow)
-            ostream.write(os.linesep)
-            ostream.write(line)
-            if ostream.isatty():
-                ostream.write(TTY.clear)
+            write_marker(line)
         # Print matching lines
         else:
-            ostream.write(os.linesep)
-            if ostream.isatty():
-                ostream.write(TTY.clear)
-            ostream.write(line)
-    ostream.write(os.linesep)
+            write_match(line)
+        count += 1
+
+    # Omit newline if nothing was written.
+    if count:
+        ostream.write(os.linesep)
 
 def context_diff(fromfile, tofile, verbose=False, ostream=sys.stdout):
     """Perform context diff on two menus.
@@ -294,46 +305,61 @@ def context_diff(fromfile, tofile, verbose=False, ostream=sys.stdout):
     fromlines = fromfile.to_diff()
     tolines = tofile.to_diff()
 
+    def write_added(line):
+        if ostream.isatty():
+            ostream.write(TTY.green)
+        ostream.write(line)
+        if ostream.isatty():
+            ostream.write(TTY.clear)
+
+    def write_removed(line):
+        if ostream.isatty():
+            ostream.write(TTY.red)
+        ostream.write(line)
+        if ostream.isatty():
+            ostream.write(TTY.clear)
+
+    def write_changed(line):
+        if ostream.isatty():
+            ostream.write(TTY.magenta)
+        ostream.write(line)
+        if ostream.isatty():
+            ostream.write(TTY.clear)
+
+    def write_marker(line):
+        if ostream.isatty():
+            ostream.write(TTY.yellow)
+        ostream.write(line)
+        if ostream.isatty():
+            ostream.write(TTY.clear)
+
+    def write_match(line):
+        ostream.write(line)
+
+    count = 0
     for line in difflib.context_diff(fromlines, tolines, fromfile=fromfile.filename, tofile=tofile.filename, lineterm=""):
+        if count:
+            ostream.write(os.linesep)
         # Print added lines
         if line.startswith('+ '):
-            if ostream.isatty():
-                ostream.write(TTY.green)
-            ostream.write(os.linesep)
-            ostream.write(line)
-            if ostream.isatty():
-                ostream.write(TTY.clear)
+            write_added(line)
         # Print removed lines
         elif line.startswith('- '):
-            if ostream.isatty():
-                ostream.write(TTY.red)
-            ostream.write(os.linesep)
-            ostream.write(line)
-            if ostream.isatty():
-                ostream.write(TTY.clear)
+            write_removed(line)
         # Print changed lines
         elif line.startswith('! '):
-            if ostream.isatty():
-                ostream.write(TTY.magenta)
-            ostream.write(os.linesep)
-            ostream.write(line)
-            if ostream.isatty():
-                ostream.write(TTY.clear)
+            write_changed(line)
         # Print diff markers
         elif line.startswith('---') or line.startswith('***'):
-            if ostream.isatty():
-                ostream.write(TTY.yellow)
-            ostream.write(os.linesep)
-            ostream.write(line)
-            if ostream.isatty():
-                ostream.write(TTY.clear)
+            write_marker(line)
         # Print matching lines
         else:
-            ostream.write(os.linesep)
-            if ostream.isatty():
-                ostream.write(TTY.clear)
-            ostream.write(line)
-    ostream.write(os.linesep)
+            write_match(line)
+        count += 1
+
+    # Omit newline if nothing was written.
+    if count:
+        ostream.write(os.linesep)
 
 def html_diff(fromfile, tofile, verbose=False, ostream=sys.stdout):
     """Perform diff on two menus and writes results to HTML table.

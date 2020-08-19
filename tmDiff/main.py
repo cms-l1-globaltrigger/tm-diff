@@ -13,7 +13,8 @@ FMT_CHOICES = [FMT_UNIFIED, FMT_CONTEXT, FMT_HTML, FMT_REPORT]
 
 SKIP_MODULE = 'module'
 SKIP_COMMENT = 'comment'
-SKIP_CHOICES = [SKIP_MODULE, SKIP_COMMENT]
+SKIP_LABELS = 'labels'
+SKIP_CHOICES = [SKIP_MODULE, SKIP_COMMENT, SKIP_LABELS]
 
 SORT_INDEX = 'index'
 SORT_NAME = 'name'
@@ -92,6 +93,10 @@ def main():
     # Skip comments
     if SKIP_COMMENT in args.skip:
         skip.append('comment')
+
+    # Skip comments
+    if SKIP_LABELS in args.skip:
+        skip.append('labels')
 
     # Extract information from XMLs
     from_menu = menudiff.Menu(from_file)

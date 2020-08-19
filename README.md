@@ -7,7 +7,7 @@ Install using pip (>= 19.0).
 
 ```bash
 pip install --upgrade pip
-pip install git+https://github.com/cms-l1-globaltrigger/tm-diff.git@0.6.3
+pip install git+https://github.com/cms-l1-globaltrigger/tm-diff.git@0.7.0
 ```
 
 ## Basic usage
@@ -43,6 +43,7 @@ Use flag `-s|--skip <mode>` to ignore certain attributes. Options are
 
  * `module` to skip implementation details (attributes `uuid_firmware`, `n_modules`, `module_id`, `module_index`)
  * `comment` to skip comments (attribute `comment`)
+ * `labels` to skip algorithm labels (attribute `labels`)
 
 **Example:**
 
