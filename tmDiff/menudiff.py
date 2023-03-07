@@ -29,8 +29,10 @@ import tmTable
 
 from . import __version__
 
+
 class TTY:
     """TTY escape codes."""
+
     clear = "\033[0m"
     red = "\033[31m"
     green = "\033[32m"
@@ -38,14 +40,15 @@ class TTY:
     blue = "\033[34m"
     magenta = "\033[35m"
 
+
 class Diffable:
     """Implements a diffabel object. To be inherited by classes defining class
     attribute `sorted_attribuites`.
     """
 
-    sorted_attributes = tuple()
+    sorted_attributes = []
 
-    default_value = ''
+    default_value = ""
 
     def __init__(self, **kwargs):
         for attr in self.sorted_attributes:
@@ -53,7 +56,7 @@ class Diffable:
 
     def fmt_attr(self, attr):
         """Format attribute used for unified diff.
-        >>> o.fmt_attr('foobar')
+        >>> o.fmt_attr("foobar")
         'foobar: 42'
         """
         return "{0}: {1}".format(attr, getattr(self, attr))
@@ -62,58 +65,62 @@ class Diffable:
         """Returns diff-able list of attributes for unified diff.
         >>> o.to_diff()
         ['foo: 42', 'bar: baz']
-        >>> o.to_diff(skip=['bar']) # skip attributes
+        >>> o.to_diff(skip=["bar"]) # skip attributes
         ['foo: 42']
         """
         skip = skip or []
         return [self.fmt_attr(attr) for attr in self.sorted_attributes if attr not in skip]
 
+
 class Meta(Diffable):
     """Diffable menu metadata container."""
 
-    sorted_attributes = (
-        'name',
-        'uuid_menu',
-        'uuid_firmware',
-        'n_modules',
-        'grammar_version',
-        'is_valid',
-        'is_obsolete',
-        'comment',
-    )
+    sorted_attributes = [
+        "name",
+        "uuid_menu",
+        "uuid_firmware",
+        "n_modules",
+        "grammar_version",
+        "is_valid",
+        "is_obsolete",
+        "comment",
+    ]
+
 
 class Algorithm(Diffable):
     """Diffable algorithm container."""
 
-    sorted_attributes = (
-        'index',
-        'module_id',
-        'module_index',
-        'name',
-        'expression',
-        'comment',
-        'labels',
-    )
+    sorted_attributes = [
+        "index",
+        "module_id",
+        "module_index",
+        "name",
+        "expression",
+        "comment",
+        "labels",
+    ]
 
-    report_attributes = (
-        'index',
-        'name',
-        'expression',
-        'labels',
-    )
+    report_attributes = [
+        "index",
+        "name",
+        "expression",
+        "labels",
+    ]
+
 
 class Cut(Diffable):
     """Diffable cut container."""
 
-    sorted_attributes = (
-        'name',
-        'type',
-        'object',
-        'minimum',
-        'maximum',
-        'data',
-        'comment',
-    )
+    sorted_attributes = [
+        "name",
+        "type",
+        "object",
+        "minimum",
+        "maximum",
+        "data",
+        "comment",
+    ]
+
 
 class Menu:
     """Simple menu container."""
@@ -121,7 +128,7 @@ class Menu:
     def __init__(self, filename):
         self.load(filename)
         self.skip = [] # list of attributes to skip
-        self.sort = 'index' # sort key for algorithms
+        self.sort = "index" # sort key for algorithms
 
     def load(self, filename):
         """Load menu from XML file."""
@@ -139,15 +146,15 @@ class Menu:
         cuts = {}
         for row in menu.algorithms:
             self.algorithms.append(Algorithm(**row))
-            if row['name'] in menu.cuts.keys():
-                for cut in menu.cuts[row['name']]:
-                    cuts[cut['name']] = Cut(**cut)
+            if row["name"] in menu.cuts.keys():
+                for cut in menu.cuts[row["name"]]:
+                    cuts[cut["name"]] = Cut(**cut)
         self.cuts = cuts.values()
 
     def sorted_algorithms(self):
         """Returns sorted list of algorithms."""
         def sort_key(algorithm):
-            if self.sort == 'index':
+            if self.sort == "index":
                 return int(algorithm.index)
             return getattr(algorithm, self.sort)
         return sorted(self.algorithms, key=sort_key)
@@ -176,10 +183,11 @@ class Menu:
         if not outdir:
             outdir = os.getcwd()
         filename = "{0}.txt".format(os.path.basename(self.filename))
-        with open(os.path.join(outdir, filename), 'w') as fp:
+        with open(os.path.join(outdir, filename), "wt") as fp:
             for line in self.to_diff():
                 fp.write(line)
                 fp.write(os.linesep)
+
 
 def report_diff(fromfile, tofile, verbose=False, ostream=sys.stdout):
     """Perform simple diff on two menus in TWiki format for reports.
@@ -245,6 +253,7 @@ def report_diff(fromfile, tofile, verbose=False, ostream=sys.stdout):
             ostream.write("      * {0}".format(algorithm.name))
             ostream.write(os.linesep)
 
+
 def unified_diff(fromfile, tofile, verbose=False, ostream=sys.stdout):
     """Perform unified diff on two menus.
     >>> unified_diff(fromfile, tofile)
@@ -281,13 +290,13 @@ def unified_diff(fromfile, tofile, verbose=False, ostream=sys.stdout):
         if count:
             ostream.write(os.linesep)
         # Print added lines
-        if line.startswith('+'):
+        if line.startswith("+"):
             write_added(line)
         # Print removed lines
-        elif line.startswith('-'):
+        elif line.startswith("-"):
             write_removed(line)
         # Print diff markers
-        elif line.startswith('@@'):
+        elif line.startswith("@@"):
             write_marker(line)
         # Print matching lines
         else:
@@ -297,6 +306,7 @@ def unified_diff(fromfile, tofile, verbose=False, ostream=sys.stdout):
     # Omit newline if nothing was written.
     if count:
         ostream.write(os.linesep)
+
 
 def context_diff(fromfile, tofile, verbose=False, ostream=sys.stdout):
     """Perform context diff on two menus.
@@ -341,16 +351,16 @@ def context_diff(fromfile, tofile, verbose=False, ostream=sys.stdout):
         if count:
             ostream.write(os.linesep)
         # Print added lines
-        if line.startswith('+ '):
+        if line.startswith("+ "):
             write_added(line)
         # Print removed lines
-        elif line.startswith('- '):
+        elif line.startswith("- "):
             write_removed(line)
         # Print changed lines
-        elif line.startswith('! '):
+        elif line.startswith("! "):
             write_changed(line)
         # Print diff markers
-        elif line.startswith('---') or line.startswith('***'):
+        elif line.startswith("---") or line.startswith("***"):
             write_marker(line)
         # Print matching lines
         else:
@@ -361,9 +371,10 @@ def context_diff(fromfile, tofile, verbose=False, ostream=sys.stdout):
     if count:
         ostream.write(os.linesep)
 
+
 def html_diff(fromfile, tofile, verbose=False, ostream=sys.stdout):
     """Perform diff on two menus and writes results to HTML table.
-    >>> with open("sample.html", "w") as f:
+    >>> with open("sample.html", "wt") as f:
     ...     html_diff(fromfile, tofile, f)
     """
     fromlines = fromfile.to_diff()
@@ -376,7 +387,7 @@ def html_diff(fromfile, tofile, verbose=False, ostream=sys.stdout):
         os.path.basename(tofile.filename),
     )
 
-    timestamp = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+    timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
     # patching CSS style and adding a footer
     patches = [

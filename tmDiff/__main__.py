@@ -1,24 +1,25 @@
 import argparse
-import sys, os
+import os
+import sys
 
 from . import menudiff
 from . import __version__
 
-FMT_UNIFIED = 'unified'
-FMT_CONTEXT = 'context'
-FMT_HTML = 'html'
-FMT_REPORT = 'report'
+FMT_UNIFIED = "unified"
+FMT_CONTEXT = "context"
+FMT_HTML = "html"
+FMT_REPORT = "report"
 FMT_DEFAULT = FMT_UNIFIED
 FMT_CHOICES = [FMT_UNIFIED, FMT_CONTEXT, FMT_HTML, FMT_REPORT]
 
-SKIP_MODULE = 'module'
-SKIP_COMMENT = 'comment'
-SKIP_LABELS = 'labels'
+SKIP_MODULE = "module"
+SKIP_COMMENT = "comment"
+SKIP_LABELS = "labels"
 SKIP_CHOICES = [SKIP_MODULE, SKIP_COMMENT, SKIP_LABELS]
 
-SORT_INDEX = 'index'
-SORT_NAME = 'name'
-SORT_EXPRESSION = 'expression'
+SORT_INDEX = "index"
+SORT_NAME = "name"
+SORT_EXPRESSION = "expression"
 SORT_DEFAULT = SORT_INDEX
 SORT_CHOICES = [SORT_INDEX, SORT_NAME, SORT_EXPRESSION]
 
@@ -29,51 +30,53 @@ DIFF_FUNCTIONS = {
     FMT_REPORT: menudiff.report_diff,
 }
 
+
 def parse_args():
     parser = argparse.ArgumentParser()
-    parser.add_argument('file',
+    parser.add_argument("file",
         nargs=2,
         help="XML menu files 'FILE1 FILE2'"
     )
-    parser.add_argument('-f', '--format',
-        metavar='<format>',
+    parser.add_argument("-f", "--format",
+        metavar="<format>",
         choices=FMT_CHOICES,
         default=FMT_DEFAULT,
-        help="select output format, default is '{0}'".format(FMT_DEFAULT)
+        help=f"select output format, default is '{FMT_DEFAULT}'"
     )
-    parser.add_argument('-s', '--skip',
-        metavar='<mode>',
-        action='append',
+    parser.add_argument("-s", "--skip",
+        metavar="<mode>",
+        action="append",
         choices=SKIP_CHOICES,
         default=[],
         help="skip information"
     )
-    parser.add_argument('--sort',
-        metavar='<key>',
+    parser.add_argument("--sort",
+        metavar="<key>",
         choices=SORT_CHOICES,
         default=SORT_DEFAULT,
-        help="select key for algorithm sorting, default is '{0}'".format(SORT_DEFAULT)
+        help=f"select key for algorithm sorting, default is '{SORT_DEFAULT}'"
     )
-    parser.add_argument('-d', '--dump',
-    action='store_true',
-    help="dump the extracted intermediate content"
+    parser.add_argument("-d", "--dump",
+        action="store_true",
+        help="dump the extracted intermediate content"
     )
-    parser.add_argument('-o',
-        dest='ostream',
-        metavar='<file>',
-        type=argparse.FileType('w'),
+    parser.add_argument("-o",
+        dest="ostream",
+        metavar="<file>",
+        type=argparse.FileType("wt"),
         default=sys.stdout,
         help="write output to file"
     )
-    parser.add_argument('-v', '--verbose',
-        action='count',
+    parser.add_argument("-v", "--verbose",
+        action="count",
         help="increase output verbosity"
     )
-    parser.add_argument('--version',
-        action='version',
+    parser.add_argument("--version",
+        action="version",
         version="%(prog)s {0}".format(__version__)
     )
     return parser.parse_args()
+
 
 def main():
     args = parse_args()
@@ -85,18 +88,18 @@ def main():
 
     # Skip module specific attributes
     if SKIP_MODULE in args.skip:
-        skip.append('uuid_firmware')
-        skip.append('n_modules')
-        skip.append('module_id')
-        skip.append('module_index')
+        skip.append("uuid_firmware")
+        skip.append("n_modules")
+        skip.append("module_id")
+        skip.append("module_index")
 
     # Skip comments
     if SKIP_COMMENT in args.skip:
-        skip.append('comment')
+        skip.append("comment")
 
     # Skip comments
     if SKIP_LABELS in args.skip:
-        skip.append('labels')
+        skip.append("labels")
 
     # Extract information from XMLs
     from_menu = menudiff.Menu(from_file)
@@ -121,5 +124,6 @@ def main():
 
     return 0
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     sys.exit(main())
