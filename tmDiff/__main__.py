@@ -1,29 +1,30 @@
 import argparse
 import os
 import sys
+from typing import Callable, Dict, List
 
 from . import menudiff
 from . import __version__
 
-FMT_UNIFIED = "unified"
-FMT_CONTEXT = "context"
-FMT_HTML = "html"
-FMT_REPORT = "report"
-FMT_DEFAULT = FMT_UNIFIED
-FMT_CHOICES = [FMT_UNIFIED, FMT_CONTEXT, FMT_HTML, FMT_REPORT]
+FMT_UNIFIED: str = "unified"
+FMT_CONTEXT: str = "context"
+FMT_HTML: str = "html"
+FMT_REPORT: str = "report"
+FMT_DEFAULT: str = FMT_UNIFIED
+FMT_CHOICES: List[str] = [FMT_UNIFIED, FMT_CONTEXT, FMT_HTML, FMT_REPORT]
 
-SKIP_MODULE = "module"
-SKIP_COMMENT = "comment"
-SKIP_LABELS = "labels"
-SKIP_CHOICES = [SKIP_MODULE, SKIP_COMMENT, SKIP_LABELS]
+SKIP_MODULE: str = "module"
+SKIP_COMMENT: str = "comment"
+SKIP_LABELS: str = "labels"
+SKIP_CHOICES: List[str] = [SKIP_MODULE, SKIP_COMMENT, SKIP_LABELS]
 
-SORT_INDEX = "index"
-SORT_NAME = "name"
-SORT_EXPRESSION = "expression"
-SORT_DEFAULT = SORT_INDEX
-SORT_CHOICES = [SORT_INDEX, SORT_NAME, SORT_EXPRESSION]
+SORT_INDEX: str = "index"
+SORT_NAME: str = "name"
+SORT_EXPRESSION: str = "expression"
+SORT_DEFAULT: str = SORT_INDEX
+SORT_CHOICES: List[str] = [SORT_INDEX, SORT_NAME, SORT_EXPRESSION]
 
-DIFF_FUNCTIONS = {
+DIFF_FUNCTIONS: Dict[str, Callable] = {
     FMT_UNIFIED: menudiff.unified_diff,
     FMT_CONTEXT: menudiff.context_diff,
     FMT_HTML: menudiff.html_diff,
@@ -31,7 +32,7 @@ DIFF_FUNCTIONS = {
 }
 
 
-def parse_args():
+def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser()
     parser.add_argument("file",
         nargs=2,
@@ -78,13 +79,13 @@ def parse_args():
     return parser.parse_args()
 
 
-def main():
+def main() -> int:
     args = parse_args()
 
-    from_file = args.file[0]
-    to_file = args.file[1]
+    from_file: str = args.file[0]
+    to_file: str = args.file[1]
 
-    skip = []
+    skip: List[str] = []
 
     # Skip module specific attributes
     if SKIP_MODULE in args.skip:
