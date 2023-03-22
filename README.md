@@ -7,7 +7,7 @@ Install using pip (>= 19.0).
 
 ```bash
 pip install --upgrade pip
-pip install git+https://github.com/cms-l1-globaltrigger/tm-diff.git@0.8.1
+pip install git+https://github.com/cms-l1-globaltrigger/tm-diff.git@0.9.0
 ```
 
 ## Basic usage
