@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.9.1] - 2024-02-27
+
+### Changed
+
+- Depends on utm 0.12.0 (#13).
+
 ## [0.9.0] - 2023-03-22
 
 ### Added
@@ -68,7 +74,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Depends on utm 0.8.0
 
-[unreleased]: https://github.com/cms-l1-globaltrigger/tm-diff/compare/0.9.0...HEAD
+[unreleased]: https://github.com/cms-l1-globaltrigger/tm-diff/compare/0.9.1...HEAD
+[0.9.1]: https://github.com/cms-l1-globaltrigger/tm-diff/compare/0.9.0...0.9.1
 [0.9.0]: https://github.com/cms-l1-globaltrigger/tm-diff/compare/0.8.1...0.9.0
 [0.8.1]: https://github.com/cms-l1-globaltrigger/tm-diff/compare/0.8.0...0.8.1
 [0.8.0]: https://github.com/cms-l1-globaltrigger/tm-diff/compare/0.7.3...0.8.0
