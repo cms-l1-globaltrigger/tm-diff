@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.9.3] - 2025-12-19
+
+### Changed
+
+- Replaced explicit Git URL-based dependency installation to custom package index.
+
 ## [0.9.2] - 2024-05-23
 
 ### Changed
@@ -80,7 +86,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Depends on utm 0.8.0
 
-[unreleased]: https://github.com/cms-l1-globaltrigger/tm-diff/compare/0.9.2...HEAD
+[unreleased]: https://github.com/cms-l1-globaltrigger/tm-diff/compare/0.9.3...HEAD
+[0.9.3]: https://github.com/cms-l1-globaltrigger/tm-diff/compare/0.9.2...0.9.3
 [0.9.2]: https://github.com/cms-l1-globaltrigger/tm-diff/compare/0.9.1...0.9.2
 [0.9.1]: https://github.com/cms-l1-globaltrigger/tm-diff/compare/0.9.0...0.9.1
 [0.9.0]: https://github.com/cms-l1-globaltrigger/tm-diff/compare/0.8.1...0.9.0

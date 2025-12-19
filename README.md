@@ -3,11 +3,8 @@ XML Menu Diff
 
 ## Install
 
-Install using pip (>= 19.0).
-
 ```bash
-pip install --upgrade pip
-pip install git+https://github.com/cms-l1-globaltrigger/tm-diff.git@0.9.2
+pip install --index https://globaltrigger.web.cern.ch/pypi tm-diff
 ```
 
 ## Basic usage
