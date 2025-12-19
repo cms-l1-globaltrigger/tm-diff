@@ -4,7 +4,7 @@ XML Menu Diff
 ## Install
 
 ```bash
-pip install --index https://globaltrigger.web.cern.ch/pypi tm-diff
+pip install --extra-index-url https://globaltrigger.web.cern.ch/pypi tm-diff
 ```
 
 ## Basic usage
